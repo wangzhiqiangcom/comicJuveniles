@@ -256,7 +256,7 @@
             <label for="" class="col-md-1 offset-md-4">邮&nbsp;&nbsp;&nbsp;&nbsp;箱：</label>
             <input id="email" name="email" type="text" class="col-md-2" placeholder="email">
         </div>
-        <div class="blank"></div>
+        <div class="blank"> </div>
         <%--<div class="row">--%>
             <%--<label for="" class="col-md-1 offset-md-4">验证码：</label>--%>
             <%--<input id="code" type="text" class="col-md-1" placeholder="code">--%>
