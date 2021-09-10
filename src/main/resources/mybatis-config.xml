@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!--表示自动开启驼峰命名法 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+    <!--typeAliases：类型别名，用来设置一些别名来代替 Java 的长类型声明，
+    如 java.lang.int 变为 int，减少配置编码的冗余。-->
+
+    <!--批量定义别名，批量指定很简单，只要指定包名即可，
+    之后程序会为包下的所有类都自动加上别名，
+    其定义别名的规范就是对应包装类的类名首字母变为小写-->
+    <typeAliases>
+        <package name="com.wzq.ssmcrud.bean" />
+    </typeAliases>
+
+    <!--分页拦截器-->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <!--分页参数合理化-->
+            <property name="reasonable" value="true" />
+        </plugin>
+    </plugins>
+</configuration>

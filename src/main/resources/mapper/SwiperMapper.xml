@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wzq.ssmcrud.dao.SwiperMapper">
+  <resultMap id="BaseResultMap" type="com.wzq.ssmcrud.bean.Swiper">
+    <id column="swiper_id" jdbcType="INTEGER" property="swiperId" />
+    <result column="swiper_name" jdbcType="VARCHAR" property="swiperName" />
+    <result column="swiper_url" jdbcType="VARCHAR" property="swiperUrl" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    swiper_id, swiper_name, swiper_url
+  </sql>
+
+  <!--自定义给轮播图的方法
+    List<Comic> selectForSwiper();
+    -->
+
+  <select id="selectForSwiper" resultMap="BaseResultMap">
+      SELECT * FROM tbl_swiper
+      LIMIT 5
+  </select>
+
+  <select id="selectByExample" parameterType="com.wzq.ssmcrud.bean.SwiperExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tbl_swiper
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_swiper
+    where swiper_id = #{swiperId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tbl_swiper
+    where swiper_id = #{swiperId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.wzq.ssmcrud.bean.SwiperExample">
+    delete from tbl_swiper
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.wzq.ssmcrud.bean.Swiper">
+    insert into tbl_swiper (swiper_id, swiper_name, swiper_url
+      )
+    values (#{swiperId,jdbcType=INTEGER}, #{swiperName,jdbcType=VARCHAR}, #{swiperUrl,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wzq.ssmcrud.bean.Swiper">
+    insert into tbl_swiper
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="swiperId != null">
+        swiper_id,
+      </if>
+      <if test="swiperName != null">
+        swiper_name,
+      </if>
+      <if test="swiperUrl != null">
+        swiper_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="swiperId != null">
+        #{swiperId,jdbcType=INTEGER},
+      </if>
+      <if test="swiperName != null">
+        #{swiperName,jdbcType=VARCHAR},
+      </if>
+      <if test="swiperUrl != null">
+        #{swiperUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.wzq.ssmcrud.bean.SwiperExample" resultType="java.lang.Long">
+    select count(*) from tbl_swiper
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update tbl_swiper
+    <set>
+      <if test="record.swiperId != null">
+        swiper_id = #{record.swiperId,jdbcType=INTEGER},
+      </if>
+      <if test="record.swiperName != null">
+        swiper_name = #{record.swiperName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.swiperUrl != null">
+        swiper_url = #{record.swiperUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update tbl_swiper
+    set swiper_id = #{record.swiperId,jdbcType=INTEGER},
+      swiper_name = #{record.swiperName,jdbcType=VARCHAR},
+      swiper_url = #{record.swiperUrl,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wzq.ssmcrud.bean.Swiper">
+    update tbl_swiper
+    <set>
+      <if test="swiperName != null">
+        swiper_name = #{swiperName,jdbcType=VARCHAR},
+      </if>
+      <if test="swiperUrl != null">
+        swiper_url = #{swiperUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where swiper_id = #{swiperId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wzq.ssmcrud.bean.Swiper">
+    update tbl_swiper
+    set swiper_name = #{swiperName,jdbcType=VARCHAR},
+      swiper_url = #{swiperUrl,jdbcType=VARCHAR}
+    where swiper_id = #{swiperId,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wzq.ssmcrud.dao.JuvenileMapper">
+  <resultMap id="BaseResultMap" type="com.wzq.ssmcrud.bean.Juvenile">
+    <id column="juvenile_id" jdbcType="INTEGER" property="juvenileId" />
+    <result column="j_name" jdbcType="VARCHAR" property="jName" />
+    <result column="gender" jdbcType="CHAR" property="gender" />
+    <result column="weapon" jdbcType="VARCHAR" property="weapon" />
+    <result column="sect" jdbcType="VARCHAR" property="sect" />
+    <result column="portrait_url" jdbcType="VARCHAR" property="portraitUrl" />
+    <result column="c_id" jdbcType="INTEGER" property="cId" />
+  </resultMap>
+
+  <!--自定义resultMap-->
+  <resultMap id="WithComicResultMap" type="com.wzq.ssmcrud.bean.Juvenile">
+    <id column="juvenile_id" jdbcType="INTEGER" property="juvenileId" />
+    <result column="j_name" jdbcType="VARCHAR" property="jName" />
+    <result column="gender" jdbcType="CHAR" property="gender" />
+    <result column="weapon" jdbcType="VARCHAR" property="weapon" />
+    <result column="sect" jdbcType="VARCHAR" property="sect" />
+    <result column="portrait_url" jdbcType="VARCHAR" property="portraitUrl" />
+    <result column="c_id" jdbcType="INTEGER" property="cId" />
+    <!--指定联合查询出的所属动漫对象的封装规则  -->
+    <association property="comic" javaType="com.wzq.ssmcrud.bean.Comic">
+      <id column="comic_id" jdbcType="INTEGER" property="comicId" />
+      <result column="c_name" jdbcType="VARCHAR" property="cName" />
+    </association>
+  </resultMap>
+
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    juvenile_id, j_name, gender, weapon, sect, portrait_url, c_id
+  </sql>
+
+  <!--自定义Base_Column_List-->
+  <sql id="WithComic_Column_List">
+    j.juvenile_id,j.j_name,j.gender,j.weapon,j.sect,j.portrait_url,j.c_id,c.comic_id,c.c_name
+  </sql>
+
+  <!--List<Juvenile> selectByExampleWithComic(JuvenileExample example);-->
+
+  <!--Juvenile selectByPrimaryKeyWithComic(Integer id);-->
+  <!--查询juvenile时带comic信息  -->
+
+  <select id="selectByExampleWithComic" parameterType="com.wzq.ssmcrud.bean.JuvenileExample" resultMap="WithComicResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="WithComic_Column_List" />
+    FROM tbl_juvenile j
+    LEFT JOIN tbl_comic c ON j.c_id = c.comic_id
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+
+  <select id="selectByPrimaryKeyWithComic" parameterType="java.lang.Integer" resultMap="WithComicResultMap">
+    select
+    <include refid="WithComic_Column_List" />
+    FROM tbl_juvenile j
+    LEFT JOIN tbl_comic c ON j.c_id = c.comic_id
+    where juvenile_id = #{juvenileId,jdbcType=INTEGER}
+  </select>
+
+  <!--自定义模糊查询-->
+  <select id="selectByVagueWithComic" parameterType="com.wzq.ssmcrud.bean.JuvenileExample" resultMap="WithComicResultMap">
+    SELECT
+    <include refid="WithComic_Column_List" />
+    FROM tbl_juvenile j LEFT JOIN tbl_comic c
+    ON j.c_id=c.comic_id
+    WHERE j.j_name LIKE CONCAT('%',#{text},'%')
+    OR j.gender LIKE CONCAT('%',#{text},'%')
+    OR j.weapon LIKE CONCAT('%',#{text},'%')
+    OR j.sect LIKE CONCAT('%',#{text},'%')
+    OR c.c_name LIKE CONCAT('%',#{text},'%');
+  </select>
+
+  <select id="selectByExample" parameterType="com.wzq.ssmcrud.bean.JuvenileExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tbl_juvenile
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_juvenile
+    where juvenile_id = #{juvenileId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tbl_juvenile
+    where juvenile_id = #{juvenileId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.wzq.ssmcrud.bean.JuvenileExample">
+    delete from tbl_juvenile
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.wzq.ssmcrud.bean.Juvenile">
+    insert into tbl_juvenile (juvenile_id, j_name, gender, 
+      weapon, sect, portrait_url, 
+      c_id)
+    values (#{juvenileId,jdbcType=INTEGER}, #{jName,jdbcType=VARCHAR}, #{gender,jdbcType=CHAR}, 
+      #{weapon,jdbcType=VARCHAR}, #{sect,jdbcType=VARCHAR}, #{portraitUrl,jdbcType=VARCHAR}, 
+      #{cId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wzq.ssmcrud.bean.Juvenile">
+    insert into tbl_juvenile
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="juvenileId != null">
+        juvenile_id,
+      </if>
+      <if test="jName != null">
+        j_name,
+      </if>
+      <if test="gender != null">
+        gender,
+      </if>
+      <if test="weapon != null">
+        weapon,
+      </if>
+      <if test="sect != null">
+        sect,
+      </if>
+      <if test="portraitUrl != null">
+        portrait_url,
+      </if>
+      <if test="cId != null">
+        c_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="juvenileId != null">
+        #{juvenileId,jdbcType=INTEGER},
+      </if>
+      <if test="jName != null">
+        #{jName,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        #{gender,jdbcType=CHAR},
+      </if>
+      <if test="weapon != null">
+        #{weapon,jdbcType=VARCHAR},
+      </if>
+      <if test="sect != null">
+        #{sect,jdbcType=VARCHAR},
+      </if>
+      <if test="portraitUrl != null">
+        #{portraitUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="cId != null">
+        #{cId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.wzq.ssmcrud.bean.JuvenileExample" resultType="java.lang.Long">
+    select count(*) from tbl_juvenile
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update tbl_juvenile
+    <set>
+      <if test="record.juvenileId != null">
+        juvenile_id = #{record.juvenileId,jdbcType=INTEGER},
+      </if>
+      <if test="record.jName != null">
+        j_name = #{record.jName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gender != null">
+        gender = #{record.gender,jdbcType=CHAR},
+      </if>
+      <if test="record.weapon != null">
+        weapon = #{record.weapon,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sect != null">
+        sect = #{record.sect,jdbcType=VARCHAR},
+      </if>
+      <if test="record.portraitUrl != null">
+        portrait_url = #{record.portraitUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cId != null">
+        c_id = #{record.cId,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update tbl_juvenile
+    set juvenile_id = #{record.juvenileId,jdbcType=INTEGER},
+      j_name = #{record.jName,jdbcType=VARCHAR},
+      gender = #{record.gender,jdbcType=CHAR},
+      weapon = #{record.weapon,jdbcType=VARCHAR},
+      sect = #{record.sect,jdbcType=VARCHAR},
+      portrait_url = #{record.portraitUrl,jdbcType=VARCHAR},
+      c_id = #{record.cId,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wzq.ssmcrud.bean.Juvenile">
+    update tbl_juvenile
+    <set>
+      <if test="jName != null">
+        j_name = #{jName,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        gender = #{gender,jdbcType=CHAR},
+      </if>
+      <if test="weapon != null">
+        weapon = #{weapon,jdbcType=VARCHAR},
+      </if>
+      <if test="sect != null">
+        sect = #{sect,jdbcType=VARCHAR},
+      </if>
+      <if test="portraitUrl != null">
+        portrait_url = #{portraitUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="cId != null">
+        c_id = #{cId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where juvenile_id = #{juvenileId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wzq.ssmcrud.bean.Juvenile">
+    update tbl_juvenile
+    set j_name = #{jName,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=CHAR},
+      weapon = #{weapon,jdbcType=VARCHAR},
+      sect = #{sect,jdbcType=VARCHAR},
+      portrait_url = #{portraitUrl,jdbcType=VARCHAR},
+      c_id = #{cId,jdbcType=INTEGER}
+    where juvenile_id = #{juvenileId,jdbcType=INTEGER}
+  </update>
+</mapper>
